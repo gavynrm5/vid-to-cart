@@ -3,106 +3,112 @@ import { LinkInput } from "@/components/LinkInput";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Product } from "@/components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
+import { LinkParser } from "@/utils/linkParser";
+import { ProductMatcher } from "@/utils/productMatcher";
+import { ProductCache } from "@/utils/cache";
 
 const Index = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
 
-  // Mock product data for demo
-  const mockProducts: Product[] = [
-    {
-      id: '1',
-      title: 'Wireless Bluetooth Earbuds with Charging Case',
-      price: 29.99,
-      originalPrice: 79.99,
-      rating: 4.5,
-      reviewCount: 12453,
-      imageUrl: 'https://images.unsplash.com/photo-1590658165737-15a047b1c24c?w=400&h=400&fit=crop',
-      store: 'Amazon',
-      affiliateUrl: '#',
-      discount: 62
-    },
-    {
-      id: '2', 
-      title: 'Portable Phone Stand Holder Adjustable Desktop',
-      price: 12.99,
-      originalPrice: 24.99,
-      rating: 4.3,
-      reviewCount: 8921,
-      imageUrl: 'https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=400&h=400&fit=crop',
-      store: 'Temu',
-      affiliateUrl: '#',
-      discount: 48
-    },
-    {
-      id: '3',
-      title: 'LED Strip Lights 16.4ft Color Changing Smart WiFi',
-      price: 19.99,
-      originalPrice: 39.99,
-      rating: 4.7,
-      reviewCount: 15632,
-      imageUrl: 'https://images.unsplash.com/photo-1558618666-fbd51c2cd44d?w=400&h=400&fit=crop',
-      store: 'Walmart',
-      affiliateUrl: '#',
-      discount: 50
-    }
-  ];
-
   const handleSearch = async (url: string, keywords: string) => {
-    setIsLoading(true);
+    const cacheKey = ProductCache.generateKey(url || undefined, keywords.split(' '));
+    
+    // Check cache first
+    const cached = ProductCache.getCached(cacheKey);
+    if (cached) {
+      setProducts(cached.products);
+      setHasSearched(true);
+      toast({
+        title: "Loaded from Cache",
+        description: `Found ${cached.products.length} products`,
+      });
+      return;
+    }
+
+    setIsVerifying(!!url);
+    setIsLoading(!url);
     setHasSearched(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      let searchKeywords: string[] = [];
       
-      // In a real app, this would parse the URL/keywords and search APIs
-      setProducts(mockProducts);
+      if (url) {
+        // Parse link for product info
+        const linkData = await LinkParser.parseLink(url);
+        searchKeywords = linkData.keywords;
+        
+        if (linkData.confidence < 0.5) {
+          toast({
+            title: "Link Analysis",
+            description: "We found limited product info in this link. Try adding keywords for better results.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // Use manual keywords
+        searchKeywords = keywords.split(' ').filter(k => k.length > 2);
+      }
+
+      setIsVerifying(false);
+      setIsLoading(true);
+
+      // Search for products
+      const result = await ProductMatcher.findProducts(searchKeywords, url ? 'tiktok' : 'other');
       
-      toast({
-        title: "Search Complete!",
-        description: `Found ${mockProducts.length} products matching your search`,
-      });
+      if (result.products.length > 0) {
+        setProducts(result.products);
+        
+        // Cache successful results
+        if (ProductCache.shouldCache(result)) {
+          ProductCache.setCached(cacheKey, result, url, searchKeywords);
+        }
+        
+        toast({
+          title: "Search Complete!",
+          description: `Found ${result.products.length} products with ${Math.round(result.confidence * 100)}% match confidence`,
+        });
+      } else {
+        toast({
+          title: "No Products Found",
+          description: "Try different keywords or check the link",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
-        title: "Search Failed",
+        title: "Search Failed", 
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+      setIsVerifying(false);
     }
   };
 
   const handleBuyClick = (product: Product) => {
-    // In a real app, this would track clicks and redirect to affiliate link
     toast({
       title: "Redirecting...",
       description: `Taking you to ${product.store} to complete your purchase`,
     });
-    
-    // Simulate opening affiliate link
-    console.log(`Redirecting to: ${product.affiliateUrl}`);
-  };
-
-  const handleNewSearch = () => {
-    setProducts([]);
-    setHasSearched(false);
+    // In production: window.open(product.affiliateUrl, '_blank');
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-inter">
       <div className="container mx-auto py-8">
         {!hasSearched || products.length === 0 ? (
           <div className="flex items-center justify-center min-h-[80vh]">
-            <LinkInput onSearch={handleSearch} isLoading={isLoading} />
+            <LinkInput onSearch={handleSearch} isLoading={isLoading} isVerifying={isVerifying} />
           </div>
         ) : (
           <div className="space-y-8">
             <div className="flex justify-center">
-              <LinkInput onSearch={handleSearch} isLoading={isLoading} />
+              <LinkInput onSearch={handleSearch} isLoading={isLoading} isVerifying={isVerifying} />
             </div>
             <ProductGrid 
               products={products} 

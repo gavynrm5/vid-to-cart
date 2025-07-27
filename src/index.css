@@ -8,52 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
 :root {
-    /* Shopping app color palette */
-    --background: 248 250 252;
-    --foreground: 215 25% 27%;
+    /* TrendBuy color palette - cream background with red accents */
+    --background: 39 48% 97%; /* #fdf8f3 cream */
+    --foreground: 0 0% 15%; /* Dark gray for text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 0 0% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 0 0% 15%;
 
-    /* Trust blue primary */
-    --primary: 217 91% 60%;
+    /* Red primary - TrendBuy brand */
+    --primary: 4 90% 58%; /* #e53935 red */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 70%;
+    --primary-light: 4 90% 70%;
 
-    /* Soft secondary */
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 215 25% 27%;
+    /* Soft cream secondary */
+    --secondary: 39 48% 95%;
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 39 48% 92%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Deal accent - warm orange */
-    --accent: 25 95% 53%;
+    /* Orange accent for deals */
+    --accent: 24 95% 53%;
     --accent-foreground: 0 0% 100%;
 
-    /* Savings green */
+    /* Success green for savings */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --border: 39 48% 88%;
+    --input: 39 48% 88%;
+    --ring: 4 90% 58%;
 
-    /* Shopping-specific design tokens */
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
-    --gradient-deal: linear-gradient(135deg, hsl(25 95% 53%), hsl(25 95% 63%));
+    /* TrendBuy-specific design tokens */
+    --gradient-hero: linear-gradient(135deg, hsl(4 90% 58%), hsl(4 90% 70%));
+    --gradient-deal: linear-gradient(135deg, hsl(24 95% 53%), hsl(24 95% 63%));
     --gradient-savings: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(39 48% 98%));
     
-    --shadow-card: 0 4px 20px -2px hsl(217 91% 60% / 0.1);
-    --shadow-deal: 0 8px 30px -4px hsl(25 95% 53% / 0.2);
-    --shadow-floating: 0 20px 40px -12px hsl(217 91% 60% / 0.15);
+    --shadow-card: 0 2px 12px -2px hsl(4 90% 58% / 0.08);
+    --shadow-deal: 0 4px 20px -4px hsl(24 95% 53% / 0.15);
+    --shadow-floating: 0 8px 32px -8px hsl(4 90% 58% / 0.12);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -122,6 +122,6 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter;
   }
 }
