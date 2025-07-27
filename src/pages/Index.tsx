@@ -35,11 +35,13 @@ const Index = () => {
     
     try {
       let searchKeywords: string[] = [];
+      let platform = 'other';
       
       if (url) {
         // Parse link for product info
         const linkData = await LinkParser.parseLink(url);
         searchKeywords = linkData.keywords;
+        platform = linkData.platform;
         
         if (linkData.confidence < 0.5) {
           toast({
@@ -57,7 +59,10 @@ const Index = () => {
       setIsLoading(true);
 
       // Search for products
-      const result = await ProductMatcher.findProducts(searchKeywords, url ? 'tiktok' : 'other');
+      const result = await ProductMatcher.findProducts(
+        searchKeywords,
+        platform
+      );
       
       if (result.products.length > 0) {
         setProducts(result.products);
