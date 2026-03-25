@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ghl-user-assignment
+    env: node
+    rootDir: ghl-user-assignment
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: GHL_AGENCY_API_KEY
+        sync: false
+      - key: INTERNAL_SECRET
+        sync: false
+      - key: SELF_PING_URL
+        value: https://ghl-user-assignment.onrender.com/health
+      - key: SELF_PING_CRON
+        value: "*/10 * * * *"
